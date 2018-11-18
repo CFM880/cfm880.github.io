@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.8.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>Android Context | JsonMi</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Android Context</h1><a id="logo" href="/.">JsonMi</a><p class="description">Android Java</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 主页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于我</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Android Context</h1><div class="post-meta">Jul 23, 2017<span> | </span><span class="category"><a href="/categories/Android/">Android</a></span></div><div class="post-content"><!--  Android 中Context各式各样，容易搞混，这一本书上的结论，搬过来 -->
+<h3 id="Android的Context功能"><a href="#Android的Context功能" class="headerlink" title="Android的Context功能"></a>Android的Context功能</h3><p> 1.获取Resiurces，从而得到drawable,color,string 等<br> 2.启动指定的组件<br> 3.获取系统服务<br> 4.获取目录</p>
+<h3 id="错误使用Context导致内存泄漏"><a href="#错误使用Context导致内存泄漏" class="headerlink" title="错误使用Context导致内存泄漏"></a>错误使用Context导致内存泄漏</h3><p>错误使用Context可能会导致内存泄漏，经典的例子就是在实现单例模式是使用Context，如下代码是可能会导致内存泄漏的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class SingleInstance &#123;</span><br><span class="line">    private Context mContext;</span><br><span class="line">    </span><br><span class="line">    private static SingleInstance sInstance;</span><br><span class="line">    public SingleInstance(Context context) &#123;</span><br><span class="line">        mContext = context;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public static SingleInstance getsInstance(Context context)&#123;</span><br><span class="line">        if (sInstance == null)&#123;</span><br><span class="line">            sInstance = new SingleInstance(context);</span><br><span class="line">        &#125;</span><br><span class="line">        return sInstance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果使用者调用getInstance时传入的Context是一个Activity或者Service的实例，那么在应用退出之前，由于单例一直存在，会导致对应的Activity或者Service被单例引用，从而不会被垃圾回收，Activity或者Service中关联的其他View或者数据结构对象也不会被释放，从而导致内存泄漏，正确的做法使用Appliction Context，因为他是应用唯一的，而且生命周期是跟应用一致的，正确的使用单例的实现如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class SingleInstance &#123;</span><br><span class="line">    private Context mContext;</span><br><span class="line">    </span><br><span class="line">    private static SingleInstance sInstance;</span><br><span class="line">    public SingleInstance(Context context) &#123;</span><br><span class="line">        mContext = context;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public static SingleInstance getsInstance(Context context)&#123;</span><br><span class="line">        if (sInstance == null)&#123;</span><br><span class="line">            sInstance = new SingleInstance(context.getApplicationConext());</span><br><span class="line">        &#125;</span><br><span class="line">        return sInstance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="Context的种类"><a href="#Context的种类" class="headerlink" title="Context的种类"></a>Context的种类</h3><p>根据Context依托的组件以及用途不同，我们可以将Context分为如下几种。</p>
+<ol>
+<li>Application：Android应用中的默认单例类，在Activity或者Service中通过getAppliction()获取到我们的Context实例，通过context.getApplication()可以获取对应全局的唯一的Context实例</li>
+<li>Activity/Service：这个两个类都是ContextWrapper的子类，在这两个类中可以通过getBaseContext()获得到它们的Context实例，不同的Activity或者Service实例，它们的Context都是独立的，不能复用</li>
+<li>BroadcastReceiver:和Activity以及Service不同，BroadcatReceiver并不是Context子类，而是在回调函数onReceive()中由Android框架转入一个Context实例。系统传入的这个Context的这个Context实例是经过剪裁的，它不能调用registerReciver()以及bindSerivce()这两个函数</li>
+<li>ContentProvider: 同样的，ContextProvider也不是Context的子类，但是在创建是系统回传一个Context实例，这样在ContextProvider中可以通过getContext()函数获取。如果ContextProvider和调用者处于相同的应用进程中，那么getContext()将返回用工全局唯一的Context实例，如果是其他进程调用的ContextProvider，那么ContextProvider将持有自身所在的进程Context实例。<h3 id="不同的Context的对比"><a href="#不同的Context的对比" class="headerlink" title="不同的Context的对比"></a>不同的Context的对比</h3></li>
+</ol>
+<p>不同组件中的Context能提供的功能不尽相同，总结如下</p>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>Application</th>
+<th>Activity</th>
+<th>Service</th>
+<th>BroadcastReciver</th>
+<th>ContentProivder</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>显示Dialog</td>
+<td>NO</td>
+<td>YES</td>
+<td>NO</td>
+<td>NO</td>
+<td>NO</td>
+</tr>
+<tr>
+<td>启动Activity</td>
+<td>NO[1]</td>
+<td>YES</td>
+<td>NO[1]</td>
+<td>NO[1]</td>
+<td>NO[1]</td>
+</tr>
+<tr>
+<td>实现Layout Inflation</td>
+<td>NO[2]</td>
+<td>YES</td>
+<td>NO[2]</td>
+<td>NO[2]</td>
+<td>NO[2]</td>
+</tr>
+<tr>
+<td>启动Service</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>绑定Service</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>NO</td>
+</tr>
+<tr>
+<td>发送Broadcast</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+</tr>
+<tr>
+<td>注册</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>NO[3]</td>
+</tr>
+<tr>
+<td>加载资源Resource</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+<td>YES</td>
+</tr>
+</tbody>
+</table>
+<p>NO[1]:对应的组件并不是真的不可以启动Activity，而是建议不要这么做，因为这些组件会在新的Task中创建Activity，而不是在原来的Task中。</p>
+<p>NO[2]:也表示不建议这么做，在非Activity中进行LayoutInflation，会使用系统默认的主题，而不是应用中设置的主题</p>
+<p>NO[3]:在Android 4.2和以上的系统上，如果注册的BroadcastRecvicer是NULL是可以的，用来获取skicky广播的当前值</p>
+<h3 id="获得Context方式"><a href="#获得Context方式" class="headerlink" title="获得Context方式"></a>获得Context方式</h3><ol>
+<li>在Activity中使用getContext()</li>
+<li>在Fragment使用在onAttch(Context context)方法中将Context设置为全局</li>
+<li>在View和ViewGroup也有getContext()，获得Conext是View或者ViewGroup所在的Activity</li>
+</ol>
+<p><img src="http://www.cfm880.com/wp-content/uploads/2017/07/WX20170723-230359@2x.png" alt="debug"></p>
+</div><div class="tags"><a href="/tags/Context/">Context</a></div><div class="post-nav"><a class="pre" href="/2017/08/06/引子/">引子</a><a class="next" href="/2017/07/08/记一次gradle多渠道，功能分割/">记一次gradle多渠道，功能分割</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Android系统/">Android系统</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Gradle/">Gradle</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端/">前端</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/工具/">工具</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/嵌入式/" style="font-size: 15px;">嵌入式</a> <a href="/tags/月记/" style="font-size: 15px;">月记</a> <a href="/tags/Context/" style="font-size: 15px;">Context</a> <a href="/tags/Android原理/" style="font-size: 15px;">Android原理</a> <a href="/tags/硬件/" style="font-size: 15px;">硬件</a> <a href="/tags/Ionic/" style="font-size: 15px;">Ionic</a> <a href="/tags/Gradle/" style="font-size: 15px;">Gradle</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/VLC/" style="font-size: 15px;">VLC</a> <a href="/tags/Git/" style="font-size: 15px;">Git</a> <a href="/tags/折腾/" style="font-size: 15px;">折腾</a> <a href="/tags/flex/" style="font-size: 15px;">flex</a> <a href="/tags/感悟/" style="font-size: 15px;">感悟</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/博客/" style="font-size: 15px;">博客</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/08/04/Android校时全过程/">Android 校时全过程</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/03/IoT_deploy/">IoT部署相关</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/16/年末了/">年末了</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/13/事件分发机制/">事件分发机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/11/10/Android消息机制/">Android消息机制</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/10/29/比分更新功能记录/">比分更新功能记录</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/09/10/Handler使用的使用/">Handler使用，内存泄漏的前前后后</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/08/常用的git命令/">常用的git命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/06/Android进程线程和内存/">Android进程/线程和内存</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/08/06/引子/">引子</a></li></ul></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2018 <a href="/." rel="nofollow">JsonMi.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
