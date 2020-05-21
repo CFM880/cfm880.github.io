@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="generator" content="Hexo 3.9.0"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>常用的git命令 | JsonMi</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/8.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">常用的git命令</h1><a id="logo" href="/.">JsonMi</a><p class="description">Android Java</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 主页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于我</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">常用的git命令</h1><div class="post-meta">Aug 8, 2017</div><div class="post-content"><h3 id="2020年04月07更新"><a href="#2020年04月07更新" class="headerlink" title="2020年04月07更新"></a>2020年04月07更新</h3><h4 id="删除子模块"><a href="#删除子模块" class="headerlink" title="删除子模块"></a>删除子模块</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 逆初始化模块，其中&#123;MOD_NAME&#125;为模块目录，执行后可发现模块目录被清空，有时候需要加 -f参数</span></span><br><span class="line">git submodule deinit &#123;MOD_NAME&#125; </span><br><span class="line"><span class="meta">#</span><span class="bash"> 删除.gitmodules中记录的模块信息（--cached选项清除.git/modules中的缓存）</span></span><br><span class="line">git rm --cached &#123;MOD_NAME&#125; </span><br><span class="line"><span class="meta">#</span><span class="bash"> 提交更改到代码库，可观察到<span class="string">'.gitmodules'</span>内容发生变更</span></span><br><span class="line">git commit -am "Remove a submodule."</span><br></pre></td></tr></table></figure>
+<p>.gitmodules中子模块的url可以手动删除</p>
+<h3 id="2019年02月19日更新"><a href="#2019年02月19日更新" class="headerlink" title="2019年02月19日更新"></a>2019年02月19日更新</h3><p>git submodule 用于子模块的添加</p>
+<p>使用场景，spax-launcher与spax-android许多相同的地方，一些类和工具方法可以抽取出来组成一个公共的模块<br>两个项目，共同使用</p>
+<h4 id="1-如何添加submodule"><a href="#1-如何添加submodule" class="headerlink" title="1.如何添加submodule"></a>1.如何添加submodule</h4><p>使用soursetree-&gt;仓库-&gt;添加子模块</p>
+<p>填写仓库地址，和映射的目录即可</p>
+<h4 id="2-更新子模块代码和拉取代码"><a href="#2-更新子模块代码和拉取代码" class="headerlink" title="2.更新子模块代码和拉取代码"></a>2.更新子模块代码和拉取代码</h4><p>命令行模式</p>
+<p>cd 到子模块目录，git checkout 子模块正常分支后，就可以正常的项目的git 操作</p>
+<p>note: </p>
+<p>在根目录下进行git 操作不影响子模块的代码，举个粒子：子模块代码有修改，在项目根目录git add ./ git commit 是不会把子模块的代码提交，必须cd到子模块目录下提交</p>
+<h4 id="3-原理猜测"><a href="#3-原理猜测" class="headerlink" title="3.原理猜测"></a>3.原理猜测</h4><p>每次提交/拉取子模块代码后，都会在根目录下spax-common文件中打上hash标签</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-Subproject commit 5d54b025712ef8eb579cf8633d4b584f449d005c</span><br><span class="line">+Subproject commit 9ca800f2911f6e86d6987ee7f0f3decf56c5f1ea</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>删除tag</td>
+<td>git push origin –delete tag <tagname></tagname></td>
+</tr>
+<tr>
+<td>删除分支</td>
+<td>git push origin –delete tag <tagname></tagname></td>
+</tr>
+<tr>
+<td>推送一个空tag/branch到远程tag/branch：</td>
+<td>git push origin :<branchname></branchname></td>
+</tr>
+<tr>
+<td>删除分支(分支和tag名一致的情况)</td>
+<td>git push origin :refs/tags/<tagname></tagname></td>
+</tr>
+<tr>
+<td>推送所有tag</td>
+<td>git push origin –tags</td>
+</tr>
+<tr>
+<td>重命名分支</td>
+<td>git branch -m <oldname> <newname></newname></oldname></td>
+</tr>
+<tr>
+<td>推送重名后的分支</td>
+<td>git push origin <newname></newname></td>
+</tr>
+</tbody>
+</table>
+</div><div class="tags"><a href="/tags/git/">git</a></div><div class="post-nav"><a class="pre" href="/2017/09/10/work_logs/02zhibodi/Handler使用的使用/">Handler使用，内存泄漏的前前后后</a><a class="next" href="/2017/08/06/work_logs/02zhibodi/Android进程线程和内存/">Android进程/线程和内存</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank"><input type="text" name="q" maxlength="20" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Android系统/">Android系统</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Gradle/">Gradle</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/前端/">前端</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/工具/">工具</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/折腾/" style="font-size: 15px;">折腾</a> <a href="/tags/博客/" style="font-size: 15px;">博客</a> <a href="/tags/audio-video/" style="font-size: 15px;">audio_video</a> <a href="/tags/嵌入式/" style="font-size: 15px;">嵌入式</a> <a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/Gradle/" style="font-size: 15px;">Gradle</a> <a href="/tags/感悟/" style="font-size: 15px;">感悟</a> <a href="/tags/Linux/" style="font-size: 15px;">Linux</a> <a href="/tags/VLC/" style="font-size: 15px;">VLC</a> <a href="/tags/月记/" style="font-size: 15px;">月记</a> <a href="/tags/Android原理/" style="font-size: 15px;">Android原理</a> <a href="/tags/shell/" style="font-size: 15px;">shell</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/旅行/" style="font-size: 15px;">旅行</a> <a href="/tags/database/" style="font-size: 15px;">database</a> <a href="/tags/Git/" style="font-size: 15px;">Git</a> <a href="/tags/硬件/" style="font-size: 15px;">硬件</a> <a href="/tags/Context/" style="font-size: 15px;">Context</a> <a href="/tags/Ionic/" style="font-size: 15px;">Ionic</a> <a href="/tags/flex/" style="font-size: 15px;">flex</a> <a href="/tags/Java/" style="font-size: 15px;">Java</a> <a href="/tags/pulgin/" style="font-size: 15px;">pulgin</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/05/21/MAC分区合并引导删除其他系统分区/">MAC分区合并引导,删除其他系统分区</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/04/14/work_logs/03spax/串口读写设计/">上控对串口读写程序的设计</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/03/14/work_logs/03spax/checkbox兼容4-4-4bug/">AndroidX appcompat Android4.4.4 CompoundButton bug</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/02/29/work_logs/03spax/native_crash_report_to_sentry/">Android Native崩溃上报到Sentry服务器</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/02/26/my_project/Linux下定时任务/">Linux下定时任务</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/12/work_logs/03spax/公网远程 adb shell/">公网远程adb shell</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/08/03/work_logs/03spax/记一次系统无缘故重启的前因后果-和一些尝试/">记一次系统无缘故重启的前因后果,和一些尝试</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/28/work_logs/03spax/root权限相关问题/">root权限相关问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/07/02/work_logs/03spax/底层重构/">底层重构</a></li><li class="post-list-item"><a class="post-list-link" href="/2019/04/27/audio_video/001_ffplay_clion/">ffplay Mac CLion Debug调试</a></li></ul></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2020 <a href="/." rel="nofollow">JsonMi.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.3.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
